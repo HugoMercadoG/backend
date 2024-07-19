@@ -25,12 +25,13 @@ app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use(express.static(path.join(__dirname)));
 
 // Rutas para servir archivos HTML específicos
-app.get('/api/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get('/ordencompra', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'ordencompra.html'));
 });
 
-app.get('/api/ordencompra.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ordencompra.html'));
+// Ruta para el índice principal
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // Rutas de la API
