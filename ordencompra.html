@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalles de Requisición</title>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+  border: 1px solid black;
+}
+       .button {
+        display: inline-block;
+        background-color: #dc3545; /* Fondo rojo por defecto */
+        color: white; /* Texto blanco por defecto */
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #c82333; /* Cambio de color al hacer hover */
+    }
+
+    .button-orange {
+        background-color: #ffc107; /* Fondo naranja */
+    }
+
+    .button-orange:hover {
+        background-color: #e0a800; /* Cambio de color al hacer hover */
+    }
+
+    /* Estilos para el mensaje modal */
+    .modal {
+        display: none; /* Por defecto oculto */
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4); /* Fondo oscuro semi-transparente */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        text-align: center; /* Alineación central del contenido */
+    }
+
+    .alert-icon {
+        font-size: 48px;
+        margin-bottom: 20px; /* Espacio debajo del icono */
+    }
+
+    .button-container {
+        text-align: center; /* Alineación central para el contenedor de botones */
+        margin-top: 20px; /* Espacio arriba del contenedor de botones */
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+    }
+
+
+ 
+    h1 {
+      color: #e67e22; /* Naranja */
+      font-size: 2.5rem; /* Aumentar tamaño de letra */
+    }
+
+    body {
+      font-size: 0.9rem;
+      margin-top: 5px; /* Reducir margen superior */
+      margin-bottom: 5px; /* Ajustar tamaño de letra base */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #000; /* Borde delgado */
+      margin-top: 5px; /* Reducir margen superior */
+      margin-bottom: 5px; /* Reducir margen inferior */
+    }
+
+    th, td {
+      padding: 5px; /* Reducir padding */
+      text-align: left;
+      border: 1px solid #000; /* Borde delgado */
+      color: #000000; /* Color de texto negro */
+    }
+
+    th {
+      background-color: #f2f2f2; /* Gris claro */
+    }
+
+    .auto-resize-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+      resize: none; /* Prevenir redimensionamiento manual */
+      height: 40px; /* Ajustar altura de textarea */
+    }
+
+    .en {
+      font-size: 10px;
+    }
+
+    .es {
+      font-size: 8px;
+    }
+
+    .editable-cell {
+      border: 1px solid black;
+      height: 15px;
+    }
+
+    .editable-textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      resize: none;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .box {
+      width: 20%;
+      border: 1px solid rgb(0, 0, 0);
+      padding: 10px;
+      text-align: center;
+    }
+
+    /* Estilo para la sección de firma */
+    .signature {
+      width: 100%;
+      height: 50px;
+      border: 1px solid rgb(0, 0, 0);
+      margin: 10px 0;
+    }
+
+    /* Estilo para el pie de página */
+    .footer {
+      text-align: center;
+      background-color: #ffecdc;
+      padding: 10px;
+      border-top: 1px solid black;
+    }
+
+    /* Textarea borde */
+    input,
+    textarea {
+      overflow: visible;
+      color: rgb(0, 0, 0);
+      border: none;
+      outline: none;
+    }
+    @media print {
+      .no-print {
+        display: none;
+      }
+      body * {
+    visibility: hidden; /* Ocultar todo */
+  }
+  #printable-area, #printable-area * {
+    visibility: visible; /* Mostrar solo el área imprimible */
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  /* Establecer tamaño de hoja y margen */
+  @page {
+    size: A4;
+    margin: 1mm 1mm 1mm 1mm; /* Márgenes superior, derecho, inferior, izquierdo */
+  }
+  th, td {
+    padding: 4px; /* Reducir espacio interior para impresión */
+    border: 1px solid black;
+    font-size: 14px; /* Asegurar que las celdas tengan bordes visibles */
+  }
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="printable-area">
+      <h1 class="mt-4 mb-4">Orden Compra</h1>
+    <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+        <tr style="background-color: #e0dcdc; font-size: 10px;">
+          <td style="width: 227px; border: none;">
+            <img src="/icons/JJ3.png" alt="Imagen" width="200px" height="60px" style="display: block; margin: 5px;">
+          </td>
+          <td style="text-align: center; width: 227px; padding: 5px 5px; border: none;">
+            <p style="margin: 2px; font-weight: bold;">QUALITY CONTROL DEPARTMENT</p>
+            <p style="margin: 2px; font-weight: bold;">QUALITY CONTROL SYSTEM MANUAL (QCSM)</p>
+            <p style="margin: 2px;">DEPARTAMENTO DE CONTROL DE CALIDAD</p>
+            <p style="margin: 2px; font-weight: bold;">PURCHASE ORDER</p>
+            <p style="margin: 2px;">ORDEN DE COMPRA</p>
+          </td>
+          <td style="text-align: right; width: 227px; padding: 5px 5px; border: none;">
+            <p style="margin: 2px;">Control de Calidad</p>
+            <p style="margin: 2px;">Rev. Iso No. <span style="font-weight: bold;">3</span> Fecha: <span style="font-weight: bold;">Feb / 2022</span></p>
+            <p style="margin: 2px;">Ultima Revision: <span style="font-weight: bold;">ISO 9001: 2015</span></p>
+            <p style="margin: 2px;">Ed. <span style="font-weight: bold;">4</span> SECTION:<span style="font-weight: bold;">20</span> EXHIBIT:<span style="font-weight: bold;">3</span> REV:<span style="font-weight: bold;">0</span></p>
+            <p style="margin: 2px;">PAGE___ OF_</p>
+          </td>
+        </tr>
+      </table>
+      
+      <table style="border-collapse: collapse; width: 100%; font-size: 12px;">
+        <tr style="text-align: center;">
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">PURCHASE ORDER No:</span> <br>
+            <span class="es">ORDEN DE COMPRA No.</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%; font-weight: bold;">
+            <input type="text" id="purchaseOrder" class="auto-resize-textarea" readonly>
+          </td>
+          
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">DATE:</span> <br>
+            <span class="es">FECHA:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%; font-weight: bold;">
+            <input type="date" id="dateField" class="auto-resize-textarea">
+          </td>
+          
+        </tr>
+        <tr style="text-align: center;">
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">ADDRESS:</span> <br>
+            <span class="es">DIRECCION:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%;">
+            <textarea v-model="address" @input="autoResize" class="auto-resize-textarea"></textarea>
+          </td>
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">REQUISITION No:</span> <br>
+            <span class="es">REQUISICION No:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%; font-weight: bold;">
+            <span id="requisitionNo"></span>
+          </td>
+        </tr>
+        <tr style="text-align: center;">
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">CONTRACT (CN):</span> <br>
+            <span class="es">NUMERO DE CONTACTO (CN):</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%;">
+            <textarea v-model="contract" @input="autoResize" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+        <tr style="text-align: center;">
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">JOB ORDER AND TAG:</span> <br>
+            <span class="es">ORDEN DE TRABAJO Y TAG:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%;">
+            <textarea v-model="jobOrder" @input="autoResize" class="auto-resize-textarea"></textarea>
+          </td>
+          <td style="border: 1px solid black; text-align: left; width: 25%">
+            <span class="en">AREA:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 25%; font-weight: bold;">
+            <span id="department"></span>
+          </td>
+        </tr>
+      </table>
+      <div id="detalleRequisicion">
+        <p style="display: none;"><strong>Fecha Requerida:</strong> <span id="requiredDeliveredDate"></span></p>
+        
+        <!-- Tabla 1: Supplier Details -->
+        <table style="border-collapse: collapse; width: 100%; height: 10px; font-size: 12px; background-color: #ffecdc;">
+          <tr style="text-align: center;">
+            <td style="border: 1px solid black; text-align: center; width: 25%">
+              <span class="en">SUPPLIER DETAILS:</span> <br>
+              <span class="es">DATOS DEL PROVEEDOR:</span>
+            </td>
+          </tr>
+        </table>
+  
+        <!-- Tabla 2: Supplier Information -->
+        <table style="border-collapse: collapse; width: 100%; height: 10px; font-size: 12px;">
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">SUPPLIER NAME:</span> <br>
+              <span class="es">NOMBRE DEL PROVEEDOR:</span>
+              <select id="supplierSelect" class="form-control" style="width: 100%; border-radius: 0.25rem; border: 1px solid #ced4da;">
+                <!-- Opciones añadidas dinámicamente -->
+                <option value="" disabled selected>Select a supplier</option>
+              </select>
+            </td>
+            
+            <!-- Celda para mostrar el proveedor seleccionado -->
+            <td id="supplierInfo" style="border: 1px solid black; text-align: center; width: 25%; background-color: #ffffff;">
+              <!-- La información del proveedor seleccionado se mostrará aquí -->
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">RFC:</span> <br>
+              <span class="es">RFC:</span>
+            </td>
+            <td id="supplierRFC" style="border: 1px solid black; text-align: center; width: 25%; padding: 5px; font-size: 0.8em;">
+              <!-- El RFC del proveedor seleccionado se mostrará aquí -->
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">CONTACT NAME:</span> <br>
+              <span class="es">NOMBRE DEL CONTACTO:</span>
+            </td>
+            <td id="supplierContactName" style="border: 1px solid black; text-align: center; width: 25%; padding: 5px; font-size: 0.8em;">
+              <!-- El nombre del contacto del proveedor seleccionado se mostrará aquí -->
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">E-MAIL:</span> <br>
+            </td>
+            <td id="supplieremail" style="border: 1px solid black; text-align: center; width: 25%; padding: 5px; font-size: 0.8em;">
+              <!-- La ciudad y el país del proveedor se mostrarán aquí -->
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">ADDRESS:</span> <br>
+              <span class="es">DIRECCION:</span>
+            </td>
+            <td id="supplierAddress" style="border: 1px solid black; text-align: left; width: 25%; padding: 5px; font-size: 0.8em; overflow-wrap: break-word;">
+              <!-- La dirección del proveedor se mostrará aquí -->
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">CITY:</span> <br>
+              <span class="es">CIUDAD:</span>
+            </td>
+            <td id="supplierCityCountry" style="border: 1px solid black; text-align: center; width: 25%; padding: 5px; font-size: 0.8em;">
+              <!-- La ciudad y el país del proveedor se mostrarán aquí -->
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">BANK AND ACCOUNT NUMBER:</span> <br>
+              <span class="es">BANCO Y NUM DE CUENTA: </span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="bankAccount" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">PAYMENT CONDITION:</span> <br>
+              <span class="es">CONDICIONES DE PAGO:</span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="paymentCondition" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">PLACE OF DELIVERY:</span> <br>
+              <span class="es">LUGAR DE ENTREGA:</span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="placeOfDelivery" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">DELIVERY TIME:</span> <br>
+              <span class="es">TIEMPO DE ENTREGA:</span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="deliveryTime" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">TERMS OF DELIVERY:</span> <br>
+              <span class="es">CONDICIONES DE ENTREGA:</span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="termsOfDelivery" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%; background-color: #e0dcdc">
+              <span class="en">QUOTATION No.:</span> <br>
+              <span class="es">COTIZACIÓN No:</span>
+            </td>
+            <td style="border: 1px solid black; text-align: center; width: 25%;">
+              <textarea v-model="quotationNumber" @input="autoResize" class="auto-resize-textarea"></textarea>
+            </td>
+          </tr>
+        </table>
+  
+        <!-- Tabla 3: Material Notes -->
+        <table style="border-collapse: collapse; width: 100%; height: 10px; font-size: 12px; background-color: #ffecdc;">
+          <tr style="text-align: center;">
+            <td style="border: 1px solid black; text-align: center; width: 25%">
+              <span class="en">THE MATERIAL MUST COMPLY WITH THE FOLLOWING NOTES:</span> <br>
+              <span class="es">EL MATERIAL DEBE CUMPLIR CON LAS SIGUIENTES NOTAS:</span>
+            </td>
+          </tr>
+        </table>
+        <td style="border: 1px solid black; text-align: left; width: 200px; height: auto" rowspan="3">
+          Notes: <br>
+          <textarea v-model="notes" @input="autoResize($event)" class="auto-resize-textarea" rows="3"></textarea>
+        </td>
+    <!-- Tabla para mostrar los detalles de los items -->
+    <table id="itemsTable" style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid black;">Item</th>
+          <th style="border: 1px solid black; width: 15%;">EQUIPMENT NO</th>
+          <th style="border: 1px solid black;">Descripción</th>
+          <th style="border: 1px solid black;">Unidad</th>
+          <th style="border: 1px solid black;">Cantidad</th>
+          <th style="border: 1px solid black; width: 15%;">PRECIO UNITARIO</th>
+          <th style="border: 1px solid black; width: 15%;">IMPORTE</th>
+        </tr>
+      </thead>
+      <tbody id="itemsList">
+        <!-- Aquí se insertarán las filas de items dinámicamente con JavaScript -->
+      </tbody>
+    </table>
+    <table style="border-collapse: collapse; border: 1px solid black; width: 100%; font-size: 12px;">
+        <tr>
+          <td style="border: 1px solid black; text-align: left; width: 212px; height: auto" rowspan="3">
+            Notes: <br>
+            <textarea v-model="notes" @input="autoResize($event)" class="auto-resize-textarea" rows="3"></textarea>
+          </td>
+          <td style="border: 1px solid black; text-align: center; width: 60px; height: auto">
+            Subtotal:
+          </td>
+          <td style="font-weight: bold; border: 1px solid black; text-align: center; width: 50px; height: auto ">
+            <textarea v-model="subtotal" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black; text-align: center; width: 60px; height: auto">
+            Des. 0%:
+          </td>
+          <td style="font-weight: bold; border: 1px solid black; text-align: center; width: 50px; height: auto">
+            <textarea v-model="discount" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black; text-align: center; width: 50px; height: auto">
+            Total PAR:
+          </td>
+          <td style=" font-weight: bold; border: 1px solid black; text-align: center; width: 50px; height: auto">
+            <textarea v-model="totalPar" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+      </table>
+      <!-- ✔✔ -->
+      <table style="border-collapse: collapse; border: 1px solid black; font-size: 12px; width: 100%;">
+        <tr>
+          <td style="border: 1px solid black; width: 202px; text-align: center; background-color: #e0dcdc;">
+            <span style="font-weight: bold;">REQUESTED BY:</span> <br> SOLICITADO POR:
+          </td>
+          <td style="border: 1px solid black; width: 202px; text-align: center; background-color: #e0dcdc;">
+            <span style="font-weight: bold;">PURCHASER:</span> <br> COMPRADO POR:
+          </td>
+          <td style="border: 1px solid black; width: 80px; text-align: center; background-color: #e0dcdc;">
+            <span style="font-weight: bold;">E-MAIL PURCHASER:</span> <br> E-MAIL COMPRADOR:
+          </td>
+          <td style="border: 1px solid black; width: 50px; text-align: center;">Tax (IVA)</td>
+          <td style="border: 1px solid black; width: 50px; text-align: center;">
+            <textarea v-model="tax" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black; text-align: center; width: 18%; font-weight: bold;">
+            <span id="requiredBy"></span>
+          </td>
+          <td style="border: 1px solid black; text-align: center;width: 18%;">
+            <textarea v-model="purchaser" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+          <td rowspan="2" style="border: 1px solid black; width: 80px; text-align: center;">
+            <textarea v-model="emailPurchaser" @input="autoResize($event)" class="auto-resize-textarea"
+              style="height: 100%;"></textarea>
+          </td>
+          <td style="border: 1px solid black; text-align: center;">
+            <span style="font-weight: bold;">TOTAL</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center;">
+            <textarea v-model="total" @input="autoResize($event)" class="auto-resize-textarea"
+              style="font-weight: bold;"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black; text-align: center;">Nombre</td>
+          <td style="border: 1px solid black; text-align: center;">Nombre y firma</td>
+          <td style="border: 1px solid black; text-align: center;">
+            <span style="font-weight: bold;">Currency:</span>
+          </td>
+          <td style="border: 1px solid black; text-align: center;">
+            <textarea v-model="currency" @input="autoResize($event)" class="auto-resize-textarea"
+              style="font-weight: bold;"></textarea>
+          </td>
+        </tr>
+      </table>
+      <!-- ✔✔ -->
+      <table style="border-collapse: collapse; border: 1px solid black; width: 100%; font-size: 12px;">
+        <tr>
+          <td style="border: 1px solid black; text-align: center;">
+            <span style="font-weight: bold;">SIGNATURE AUTHORIZATION</span> <br> FIRMA DE AUTORIZACION
+          </td>
+          <td style="border: 1px solid black; text-align: center;">
+            <span style="font-weight: bold;">BILLING DATA:</span> <br> DATOS DE FACTURACION:
+          </td>
+          <td style="border: 1px solid black; text-align: center;">
+            <span style="font-weight: bold;">SEND INVOICE TO:</span> <br> ENVIAR FACTURA A:
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid black; width: 33%; height: 50px; text-align: center;"></td>
+          <td style="border: 1px solid black; width: 33%; height: 50px; text-align: center;">
+            <textarea v-model="billingData" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+          <td style="border: 1px solid black; width: 33%; height: 50px; text-align: center;">
+            <textarea v-model="sendInvoiceTo" @input="autoResize($event)" class="auto-resize-textarea"></textarea>
+          </td>
+        </tr>
+      </table>
+      <!-- ✔✔ -->
+      <table style="border-collapse: collapse; border: 1px solid black; width: 100%; font-size: 12px;">
+        <tr>
+          <td
+            style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 50%;">
+            CADEREYTA</td>
+          <td
+            style="border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; width: 50%;">
+            TULA DE ALLENDE</td>
+        </tr>
+      </table>
+      <!-- ✔✔ -->
+      <table style="border-collapse: collapse; font-size: 12px; width: 100%;">
+        <tr>
+          <td class="footer">
+            JJ GOLE S.A. DE C.V. Queda prohibida la producción total o parcial de este documento, sin el previo aviso y
+            expresa autorización de la compañía. Las que se expidan de este documento; son copias no controladas, y son
+            responsabilidad de quien(es) las solicita y/o autoriza.
+          </td>
+        </tr>
+      </table>
+    </div>
+    </div>
+  </div>
+  <!-- Botón para imprimir orden -->
+<div class="button-container">
+  <button class="button no-print" onclick="mostrarAlerta()">Imprimir Orden de Compra</button>
+</div>
+
+<!-- Mensaje modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+      <div class="alert-icon">
+          <img src="/icons/warning.png" alt="Icono personalizado" style="width: 64px; height: 64px;">
+      </div>
+      <p><strong>Nota importante:</strong> Antes de mandar a imprimir, asegúrate de ajustar la escala de impresión manualmente a un 55% para que la orden salga correctamente. Si no sabes cómo hacerlo, puedes seguir nuestro tutorial.</p>
+      <div class="button-container">
+          <button class="button" onclick="continuarImpresion()">Continuar con la impresión</button>
+          <a href="/tutoprint" target="_blank" class="button button-orange">Ir al tutorial</a>
+      </div>
+      <button class="button button-orange" onclick="cerrarAlerta()">Cancelar y volver a la orden </button>
+    </div>
+</div>
+    <!-- Bootstrap JS y Popper.js (opcional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+ let suppliers = []; // Variable global para almacenar los proveedores
+
+async function fetchSuppliers() {
+  try {
+    const response = await fetch('http://localhost:48983/api/proveedores'); // Ajusta el puerto si es necesario
+    suppliers = await response.json(); // Guardar todos los proveedores en la variable global
+    populateSupplierSelect(suppliers);
+  } catch (error) {
+    console.error('Error fetching suppliers:', error);
+  }
+}
+
+function populateSupplierSelect(suppliers) {
+  const supplierSelect = document.getElementById('supplierSelect');
+  supplierSelect.innerHTML = ''; // Limpiar las opciones existentes
+
+  // Añadir una opción de selección inicial
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select a supplier';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  supplierSelect.appendChild(defaultOption);
+
+  suppliers.forEach(supplier => {
+    const option = document.createElement('option');
+    option.value = supplier.proveedor_id; // Cambia según el campo que quieras usar como valor
+    option.textContent = supplier.nombreComercial || supplier.nombreRazonSocial; // Usa el campo adecuado
+    supplierSelect.appendChild(option);
+  });
+
+  // Agregar un evento para actualizar la celda de información y ocultar el select al cambiar la selección
+  supplierSelect.addEventListener('change', function() {
+    const selectedSupplierId = this.value;
+    const selectedSupplier = suppliers.find(supplier => supplier.proveedor_id == selectedSupplierId);
+
+    if (selectedSupplier) {
+      const supplierName = selectedSupplier.nombreComercial || selectedSupplier.nombreRazonSocial;
+      const address = `
+        Calle y Número: ${selectedSupplier.calleNumero}\n
+        Colonia: ${selectedSupplier.colonia}\n
+        Localidad/Municipio: ${selectedSupplier.localidadMunicipio}\n
+        Código Postal: ${selectedSupplier.codigoPostal}
+      `;
+      const cityCountry = `${selectedSupplier.ciudadEstado}, ${selectedSupplier.pais}`;
+      const rfc = selectedSupplier.rfc;
+      const contactName = selectedSupplier.nombreContacto;
+      const email= selectedSupplier.correoElectronico// Asumimos que el nombre del contacto está en el campo `nombreContacto`
+
+
+      // Mostrar la información del proveedor y dirección en las celdas correspondientes
+      document.getElementById('supplierInfo').innerText = supplierName;
+      document.getElementById('supplierAddress').innerText = address;
+      document.getElementById('supplierCityCountry').innerText = cityCountry;
+      document.getElementById('supplierRFC').innerText = rfc;
+      document.getElementById('supplierContactName').innerText = contactName;
+      document.getElementById('supplieremail').innerText=email;
+
+      // Ocultar solo el select
+      this.style.display = 'none';
+    } else {
+      document.getElementById('supplierInfo').innerText = 'No supplier selected';
+      document.getElementById('supplierAddress').innerText = '';
+      document.getElementById('supplierCityCountry').innerText = '';
+      document.getElementById('supplierRFC').innerText = '';
+      document.getElementById('supplierContactName').innerText = '';
+      document.getElementById('supplieremail').innerText = '';
+
+
+    }
+  });
+}
+
+      function mostrarAlerta() {
+    // Mostrar el mensaje modal
+    document.getElementById('modal').style.display = 'block';
+}
+
+function cerrarAlerta() {
+    // Cerrar el mensaje modal
+    document.getElementById('modal').style.display = 'none';
+}
+
+function continuarImpresion() {
+    // Aquí podrías agregar lógica adicional antes de continuar con la impresión
+    cerrarAlerta(); // Cerrar el modal
+    window.print(); // Continuar con la impresión
+}
+
+
+      document.addEventListener('DOMContentLoaded', function() {
+     
+        // Generar la fecha actual en el campo dateField
+        const dateField = document.getElementById('dateField');
+        const today = new Date().toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+        dateField.value = today;
+    
+        // Generar el número de orden automáticamente
+        const purchaseOrderField = document.getElementById('purchaseOrder');
+        const orderNumber = generateOrderNumber();
+        purchaseOrderField.value = orderNumber;
+      });
+      fetchSuppliers();
+      let orderCounter = 1; // Contador de órdenes
+    
+      function generateOrderNumber() {
+        const prefix = "OC-TUL-";
+        const paddedCounter = String(orderCounter).padStart(3, '0'); // Rellenar con ceros a la izquierda
+        orderCounter++; // Incrementar el contador para la próxima orden
+        return `${prefix}${paddedCounter}`; // Corregido: Usar interpolación de cadenas
+      }
+    
+      // Función para cargar los detalles de la requisición desde localStorage y mostrar los items en la tabla
+      document.addEventListener('DOMContentLoaded', () => {
+        // Obtener los detalles de la requisición guardados en localStorage
+        const requisicionSeleccionada = JSON.parse(localStorage.getItem('requisicionSeleccionada'));
+        document.getElementById('requisitionNo').textContent = requisicionSeleccionada.requisitionNo;
+        document.getElementById('requiredBy').textContent = requisicionSeleccionada.requiredBy;
+        document.getElementById('department').textContent = requisicionSeleccionada.department;
+        document.getElementById('requiredDeliveredDate').textContent = requisicionSeleccionada.requiredDeliveredDate;
+    
+        // Verificar que existan detalles de requisición guardados
+        if (requisicionSeleccionada && requisicionSeleccionada.items) {
+          const itemsList = document.getElementById('itemsList');
+    
+          // Limpiar la tabla antes de insertar nuevos datos
+          itemsList.innerHTML = '';
+    
+          // Iterar sobre los items y crear las filas de la tabla
+          requisicionSeleccionada.items.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td style="border: 1px solid black;">${item.itemId}</td>
+              <td style="border: 1px solid black;"><input type="text" value="${item.equipmentNo || ''}" class="form-control" id="equipmentNo${item.itemId}"></td>
+              <td style="border: 1px solid black;">${item.description}</td>
+              <td style="border: 1px solid black;">${item.unit}</td>
+              <td style="border: 1px solid black;">${item.quantity}</td>
+              <td style="border: 1px solid black;"><input type="text" value="${item.unitPrice || ''}" class="form-control" id="unitPrice${item.itemId}"></td>
+              <td style="border: 1px solid black;"><input type="text" value="${item.amount || ''}" class="form-control" id="amount${item.itemId}"></td>
+            `;
+            itemsList.appendChild(row);
+          });
+        } else {
+          // Mostrar mensaje o realizar otra acción si no se encuentran detalles de requisición
+          console.error('No se encontraron detalles de requisición almacenados.');
+          // Puedes redirigir o mostrar un mensaje de error aquí si es necesario
+        }
+      });
+    </script>
+    
+  </div>
+</body>
+</html>

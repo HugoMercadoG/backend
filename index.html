@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Requisiciones</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Estilos personalizados -->
+  <style>
+    h1 {
+      color: #e67e22; /* Naranja */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2; /* Gris claro */
+    }
+    .btn-orange {
+      background-color: #e67e22;
+      color: #fff;
+      border: none;
+    }
+    .btn-orange:hover {
+      background-color: #d35400; /* Naranja más oscuro al pasar el mouse */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-4 mb-4">Lista de Requisiciones</h1>
+    <table id="requisicionesTable" class="table table-striped table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Requisición ID</th>
+          <th>Requisición No</th>
+          <th>Fecha</th>
+          <th>Solicitante</th>
+          <th>Departamento</th>
+          <th>Fecha Requerida</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí se insertarán las filas de requisiciones -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Bootstrap JS y Popper.js (opcional, si necesitas funcionalidad de Bootstrap que requiera Popper.js) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Variable global para almacenar los detalles de la requisición seleccionada
+    let requisicionSeleccionada = {};
+
+    // Código JavaScript para obtener datos de la API y mostrarlos en la tabla
+    async function obtenerRequisiciones() {
+      try {
+        const response = await fetch('/api/requisiciones');
+        const requisiciones = await response.json();
+
+        const tableBody = document.querySelector('#requisicionesTable tbody');
+        tableBody.innerHTML = ''; // Limpiar tabla antes de insertar nuevas filas
+
+        const requisicionesIds = new Set();
+
+        requisiciones.forEach(requisicion => {
+          if (!requisicionesIds.has(requisicion.requisicion_id)) {
+            requisicionesIds.add(requisicion.requisicion_id);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${requisicion.requisicion_id}</td>
+              <td>${requisicion.requisitionNo}</td>
+              <td>${requisicion.date}</td>
+              <td>${requisicion.requiredBy}</td>
+              <td>${requisicion.department}</td>
+              <td>${requisicion.requiredDeliveredDate}</td>
+              <td><button class="btn btn-orange btn-sm" onclick="guardarRequisicion(${requisicion.requisicion_id})">Generar Orden de Compra</button></td>
+            `;
+            tableBody.appendChild(row);
+          }
+        });
+
+      } catch (error) {
+        console.error('Error al obtener requisiciones:', error);
+        alert('Hubo un problema al obtener las requisiciones.');
+      }
+    }
+
+    // Función para obtener y guardar los detalles de la requisición seleccionada en la variable global
+    async function guardarRequisicion(requisicionId) {
+      try {
+        const response = await fetch(`/api/requisiciones/${requisicionId}`);
+        const requisicion = await response.json();
+
+        // Estructura de la variable global con los detalles y los ítems de la requisición
+        requisicionSeleccionada = {
+          requisicionId: requisicion[0].requisicion_id,
+          requisitionNo: requisicion[0].requisitionNo,
+          requiredBy: requisicion[0].requiredBy,
+          department: requisicion[0].department,
+          requiredDeliveredDate: requisicion[0].requiredDeliveredDate,
+          items: requisicion.map((item, index) => ({
+            itemId: index + 1,
+            quantity: item.quantity,
+            unit: item.unit,
+            description: item.description,
+            specification: item.specification,
+            stock: item.stock,
+            remarks: item.remarks
+          }))
+        };
+
+        // Guardar en localStorage
+        localStorage.setItem('requisicionSeleccionada', JSON.stringify(requisicionSeleccionada));
+        
+        // Redirigir a la página de orden de compra
+        window.location.href = '/ordencompra';
+
+      } catch (error) {
+        console.error('Error al obtener detalles de la requisición:', error);
+        alert('Hubo un problema al obtener los detalles de la requisición.');
+      }
+    }
+
+    // Llamar a la función para obtener requisiciones al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      obtenerRequisiciones();
+    });
+  </script>
+</body>
+</html>
