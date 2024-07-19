@@ -20,8 +20,21 @@ connection.connect(err => {
 });
 
 app.use(express.static(path.join(__dirname, 'views')));
-app.use('/icons', express.static(path.join(__dirname, 'icons')));
-// Rutas
+app.get('/icons/JJ3.png', (req, res) => {
+  res.sendFile(path.join(__dirname, 'icons', 'JJ3.png'));
+});
+
+app.get('/icons/logo-index.png', (req, res) => {
+  res.sendFile(path.join(__dirname, 'icons', 'logo-index.png'));
+});
+
+app.get('/icons/LogoLargo.png', (req, res) => {
+  res.sendFile(path.join(__dirname, 'icons', 'LogoLargo.png'));
+});
+
+app.get('/icons/warning.png', (req, res) => {
+  res.sendFile(path.join(__dirname, 'icons', 'warning.png'));
+});// Rutas
 app.use(express.static(path.join(__dirname)));
 
 // Rutas para servir archivos HTML específicos
