@@ -25,7 +25,7 @@ app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use(express.static(path.join(__dirname)));
 
 // Rutas para servir archivos HTML específicos
-app.get('/ordencompra', (req, res) => {
+app.get('/ordencompra.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'ordencompra.html'));
 });
 
